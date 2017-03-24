@@ -2,6 +2,7 @@
 #define PHIDGET_BASIC_DEVICE
 
 #include <stdexcept>
+#include <string>
 
 #include <ros/duration.h>
 #include <ros/names.h>
@@ -17,9 +18,12 @@ protected:
 
 public:
   BasicDevice(const std::string &ns = "~") {
+    namespace rn = ros::names;
+    namespace rp = ros::param;
+
     // load parameters
-    const int serial_number(ros::param::param(ros::names::append(ns, "serial_number"), -1));
-    const ros::Duration timeout(ros::param::param(ros::names::append(ns, "timeout"), 10.));
+    const int serial_number(rp::param(rn::append(ns, "serial_number"), -1));
+    const ros::Duration timeout(rp::param(rn::append(ns, "timeout"), 10.));
 
     // create and open the device
     expectOk(CreateFunction(&handle_));

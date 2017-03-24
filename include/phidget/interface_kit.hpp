@@ -15,19 +15,23 @@
 
 #include <phidget_msgs/InterfaceKitState.h>
 
+#include <phidget21.h>
+
 namespace phidget {
 
 class InterfaceKit : public BasicDevice< CPhidgetInterfaceKitHandle, CPhidgetInterfaceKit_create > {
 public:
   InterfaceKit(ros::NodeHandle nh, const std::string &ns = "~") : Base(ns) {
+    namespace rn = ros::names;
+    namespace rp = ros::param;
+
     // load parameters
-    const ros::Rate rate(ros::param::param(ros::names::append(ns, "rate"), 10.));
+    const ros::Rate rate(rp::param(rn::append(ns, "rate"), 10.));
 
     // ensure the device is an interface kit
     expectTrue(getDeviceClass() == PHIDCLASS_INTERFACEKIT, "Not an interface kit");
 
     // start publishing state of the device
-    seq_ = 0;
     publisher_ = nh.advertise< phidget_msgs::InterfaceKitState >("phidget_interface_kit_state", 1);
     timer_ = nh.createTimer(rate.expectedCycleTime(), &InterfaceKit::publishState, this);
   }
@@ -37,13 +41,12 @@ public:
 private:
   void publishState(const ros::TimerEvent &) {
     // do not publish if no subscribers
-    if (publisher_.getNumSubscribers() == 0) {
+    if (publisher_.getNumSubscribers() <= 0) {
       return;
     }
 
     // get state of the device
     phidget_msgs::InterfaceKitState state;
-    state.header.seq = (seq_++);
     state.header.stamp = ros::Time::now();
     {
       int count;
@@ -73,7 +76,6 @@ private:
 private:
   ros::Publisher publisher_;
   ros::Timer timer_;
-  std::size_t seq_;
 };
 }
 
