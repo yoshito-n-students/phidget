@@ -32,7 +32,7 @@ public:
     expectTrue(getDeviceClass() == PHIDCLASS_INTERFACEKIT, "Not an interface kit");
 
     // start publishing state of the device
-    publisher_ = nh.advertise< phidget_msgs::InterfaceKitState >("phidget_interface_kit_state", 1);
+    publisher_ = nh.advertise< phidget_msgs::InterfaceKitState >("state", 1);
     timer_ = nh.createTimer(rate.expectedCycleTime(), &InterfaceKit::publishState, this);
   }
 
